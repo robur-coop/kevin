@@ -1,0 +1,36 @@
+(executable
+ (name main)
+ (modules main)
+ (link_flags :standard -cclib "-z solo5-abi=hvt")
+ (libraries
+  cmdliner
+  logs.fmt
+  logs.cli
+  fmt.cli
+  re
+  gmp
+  mnet
+  mirage-crypto-rng-mkernel
+  jsont
+  vifu
+  bancos.mpart)
+ (foreign_stubs
+  (language c)
+  (names manifest)))
+
+(rule
+ (targets manifest.c)
+ (enabled_if
+  (= %{context_name} "default"))
+ (action
+  (write-file manifest.c "")))
+
+(rule
+ (targets manifest.c)
+ (deps manifest.json)
+ (enabled_if
+  (= %{context_name} "solo5"))
+ (action
+  (run solo5-elftool gen-manifest manifest.json manifest.c)))
+
+(vendored_dirs vendors)
