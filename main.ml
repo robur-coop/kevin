@@ -29,7 +29,7 @@ let vget rowex req (key : Rowex.key) _server _ =
       let* () = Vifu.Response.with_json req Jsont.int_as_string value in
       Vifu.Response.respond `OK
   with Not_found ->
-      let* () = Vifu.Response.with_text req (Fmt.str "%s not found" (key :> string)) in
+      let* () = Vifu.Response.with_text req (Fmt.str "%s not found\n" (key :> string)) in
       Vifu.Response.respond `Not_found
 
 let vadd rowex req _server _ =
@@ -45,7 +45,7 @@ let vadd rowex req _server _ =
       let* () = Vifu.Response.empty in
       Vifu.Response.respond `OK
   | Error _ ->
-      let* () = Vifu.Response.with_text req "Invalid JSON request" in
+      let* () = Vifu.Response.with_text req "Invalid JSON request\n" in
       Vifu.Response.respond `Bad_request
 
 let vrem rowex req (key : Rowex.key) _server _ =
@@ -93,6 +93,11 @@ let utf_8 =
 let t0 = Mkernel.clock_monotonic ()
 let error_msgf fmt = Fmt.kstr (fun msg -> Error (`Msg msg)) fmt
 let neg fn = fun x -> not (fn x)
+let pp_mpart_tag ppf tags =
+  let tags = Option.value ~default:Logs.Tag.empty tags in
+  match Logs.Tag.get Mpart.tag tags with
+  | uid -> Fmt.pf ppf "[%a]" Fmt.(styled `Yellow int) uid
+  | exception _exn -> ()
 
 let reporter sources ppf =
   let re = Option.map Re.compile sources in
@@ -105,12 +110,12 @@ let reporter sources ppf =
       over ();
       k ()
     in
-    let pp header _tags k ppf fmt =
+    let pp header tags k ppf fmt =
       let t1 = Mkernel.clock_monotonic () in
       let delta = Float.of_int (t1 - t0) in
       let delta = delta /. 1_000_000_000. in
       Fmt.kpf k ppf
-        ("[+%a][%a]%a[%a]: " ^^ fmt ^^ "\n%!")
+        ("[+%a][%a]%a[%a]%a: " ^^ fmt ^^ "\n%!")
         Fmt.(styled `Blue (fmt "%04.04f"))
         delta
         Fmt.(styled `Cyan int)
@@ -118,6 +123,7 @@ let reporter sources ppf =
         Logs_fmt.pp_header (level, header)
         Fmt.(styled `Magenta string)
         (Logs.Src.name src)
+        pp_mpart_tag tags
     in
     match (level, print src) with
     | Logs.Debug, false -> k ()
