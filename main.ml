@@ -195,7 +195,7 @@ let term =
   const run $ setup_logs $ ipv4 $ ipv4_gateway $ port
 
 let cmd =
-  let info = Cmd.info "unikave" in
+  let info = Cmd.info "kevin" in
   Cmd.v info term
 
 let () = Cmd.(exit @@ eval cmd)
