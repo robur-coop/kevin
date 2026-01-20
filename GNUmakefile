@@ -7,9 +7,9 @@ kevin.hvt.target: | vendors
 	@echo " BUILD main.exe"
 	@dune build --root . --profile=release ./main.exe
 	@echo " DESCR main.exe"
-	@dune describe location \
+	@$(shell dune describe location \
 		--context solo5 --no-print-directory --root . --display=quiet \
-		./main.exe 2>&1 tee $@
+		./main.exe &> $@)
 
 kevin.hvt: kevin.hvt.target
 	@echo " COPY kevin.hvt"
