@@ -9,7 +9,7 @@ kevin.hvt.target: | vendors
 	@echo " DESCR main.exe"
 	@$(shell dune describe location \
 		--context solo5 --no-print-directory --root . --display=quiet \
-		./main.exe &> $@)
+		./main.exe 1> $@ 2>&1)
 
 kevin.hvt: kevin.hvt.target
 	@echo " COPY kevin.hvt"
