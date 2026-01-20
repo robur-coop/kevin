@@ -13,7 +13,8 @@
   mirage-crypto-rng-mkernel
   jsont
   vifu
-  bancos.mpart)
+  rowex
+  mpart)
  (foreign_stubs
   (language c)
   (names manifest)))
