@@ -7,16 +7,13 @@ kevin.hvt.target: | vendors
 	@echo " BUILD main.exe"
 	@dune build --root . --profile=release ./main.exe
 	@echo " DESCR main.exe"
-	dune describe location \
-		--context solo5 --no-print-directory --root . \
-		./main.exe
-	dune describe location \
-		--context solo5 --no-print-directory --root . \
+	@dune describe location \
+		--context solo5 --no-print-directory --root . --display=quiet \
 		./main.exe &> $@
 
 kevin.hvt: kevin.hvt.target
-	@echo " COPY kevin.hvt ($(cat kevin.hvt.target))"
-	@cp $(cat kevin.hvt.target) $@
+	@echo " COPY kevin.hvt"
+	@cp $(file < kevin.hvt.target) $@
 	@chmod +w $@
 	@echo " STRIP kevin.hvt"
 	@strip $@
